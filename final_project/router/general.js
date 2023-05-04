@@ -13,7 +13,7 @@ public_users.post("/register", (req,res) => {
 // Get the book list available in the shop
 public_users.get('/',async function (req, res) {
   //Write your code here
-  const results = await SON.stringify(books)
+  const results = await JSON.stringify(books)
   return res.status(300).json(results);
 });
 
@@ -28,9 +28,24 @@ public_users.get('/isbn/:isbn',async function (req, res) {
   
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const authorName = req.params.author;
+  const bookIds = Object.keys(books);
+  const booksByAuthor = [];
+  
+  bookIds.forEach((id) => {
+    const book = books[id];
+    if (book.author === authorName) {
+      booksByAuthor.push({id, ...book});
+    }
+  });
+  
+  if (booksByAuthor.length === 0) {
+    return res.status(404).json({message: "No books found for the provided author"});
+  }
+  
+  return res.status(200).json({books: booksByAuthor});
 });
+
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
